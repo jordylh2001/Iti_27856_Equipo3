@@ -150,14 +150,14 @@ public class MainActivity extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 do {
                     C1 = cursor.getString(cursor
-                            .getColumnIndex("_id"));
+                            .getColumnIndexOrThrow("_id"));
 
                     C2 = cursor.getString(cursor
-                            .getColumnIndex("nombre"));
+                            .getColumnIndexOrThrow("nombre"));
                     C3 = cursor.getString(cursor
-                            .getColumnIndex("descripcion"));
+                            .getColumnIndexOrThrow("descripcion"));
                     C4 = cursor.getString(cursor
-                            .getColumnIndex("marca"));
+                            .getColumnIndexOrThrow("marca"));
 
                     Products.add(C1 + "-" + C2 + "-" + C3 + "-" + C4);
 
@@ -176,14 +176,14 @@ public class MainActivity extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 do {
                     C1 = cursor.getString(cursor
-                            .getColumnIndex("_id"));
+                            .getColumnIndexOrThrow("_id"));
 
                     C2 = cursor.getString(cursor
-                            .getColumnIndex("nombre"));
+                            .getColumnIndexOrThrow("nombre"));
                     C3 = cursor.getString(cursor
-                            .getColumnIndex("descripcion"));
+                            .getColumnIndexOrThrow("descripcion"));
                     C4 = cursor.getString(cursor
-                            .getColumnIndex("marca"));
+                            .getColumnIndexOrThrow("marca"));
 
                     Products.add(C1 + "-" + C2 + "-" + C3 + "-" + C4);
 
@@ -203,14 +203,14 @@ public class MainActivity extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 do {
                     C1 = cursor.getString(cursor
-                            .getColumnIndex("_id"));
+                            .getColumnIndexOrThrow("_id"));
 
                     C2 = cursor.getString(cursor
-                            .getColumnIndex("nombre"));
+                            .getColumnIndexOrThrow("nombre"));
                     C3 = cursor.getString(cursor
-                            .getColumnIndex("descripcion"));
+                            .getColumnIndexOrThrow("descripcion"));
                     C4 = cursor.getString(cursor
-                            .getColumnIndex("marca"));
+                            .getColumnIndexOrThrow("marca"));
 
                     Fin += C1 + "-" + C2 + "-" + C3 + "-" + C4 + "\n";
 
