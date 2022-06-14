@@ -1,5 +1,7 @@
 package com.upv.pm_2022;
 
+import static android.widget.AdapterView.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -7,8 +9,12 @@ import android.content.ContentValues;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -136,6 +142,18 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        /*
+        // Creamos el método OnItem
+        listView.setOnClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String name = adapterView.getItemAtPosition(i).toString();
+                Log.d(,"onItemClick: Has clickeado en: " + name);
+            }
+        });
+         */
+
+
 
         //adapter.notifyDataSetChanged();
 
