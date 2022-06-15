@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog AD;
     SQLiteDatabase db;
     int SiguienteID;
-    EditText edt1,edt2,edt3,edt4,edt5;
+    EditText edt1,edt2,edt3,edt4,edt5, idEdtName, idEdtDescription, idEdtBrand;
     Cursor cursor;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
     private TextView TV1;
@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     private ArrayAdapter<String> adapter;
+
+    private ListView editListview;
 
     private Button BT1,BT2,BT3,BT4;
     private ListView listView;
@@ -88,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
         edt5=(EditText)findViewById(R.id.Price);
         TV1=(TextView)findViewById(R.id.TV2);
         listView = (ListView)findViewById(R.id.Listview1);
+
+        idEdtName = (EditText) findViewById(R.id.idEdtName);
+        idEdtDescription = (EditText) findViewById(R.id.idEdtDescription);
+        idEdtBrand = (EditText) findViewById(R.id.idEdtBrand);
+
+        editListview = (ListView) findViewById(R.id.idEdtLitsView);
+
         ADX = new AlertDialog.Builder(this);
         AD = ADX.create();
         String ArchivoDB = NOMBRE_BASE_DATOS;
@@ -142,6 +151,76 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        //Ver si hay contenido dentro del los productos
+        if (Products != null){
+            adapter=new ArrayAdapter<String>
+                    (getApplicationContext(),android.R.layout.simple_list_item_1,Products);
+            editListview.setAdapter(adapter);
+        }
+        //Funcion para poder cargar el contenido dentro del listview
+        editListview.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // TODO Auto-generated method stub
+                String value = adapter.getItem(position);
+                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+
+                int pos = position +1;
+
+                cursor = db.rawQuery("select * from "+TABLA_PRINCIPAL+" WHERE _id ="+pos, null);
+
+                if (cursor.getCount() != 0) {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            //C1 = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+
+                            idEdtName.setText(cursor.getString(cursor.getColumnIndexOrThrow("nombre")));
+                            idEdtDescription.setText(cursor.getString(cursor.getColumnIndexOrThrow("descripcion")));
+                            idEdtBrand.setText(cursor.getString(cursor.getColumnIndexOrThrow("marca")));
+
+                        } while (cursor.moveToNext());
+                    }
+                }
+                cursor.close();
+            }
+        });
+
+        //Boton para actualizar Producto
+        BT3 = (Button) findViewById(R.id.idBtnUpdateProduct);
+        BT3.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+                // TODO Auto-generated method stub
+
+                if(db != null)
+                {
+                    Toast.makeText(MainActivity.this, "Update" ,Toast.LENGTH_SHORT).show();
+                    //Generamos los datos
+                    //int codigo = SiguienteID;
+                    String Args;
+                    ContentValues values = new ContentValues();
+                    values.put("nombre",idEdtName.getText().toString());
+                    values.put("descripcion",idEdtDescription.getText().toString());
+                    values.put("marca",idEdtBrand.getText().toString());
+
+                    Args = idEdtName.getText().toString();
+
+                    db.update(TABLA_PRINCIPAL,values,"nombre = ?",new String[]{Args});
+                    //db.insert(TABLA_PRINCIPAL,null,values);
+                    AD.setMessage("Producto actualizado");
+                    AD.show();
+                }
+
+                mostrar();
+                adapter=new ArrayAdapter<String>
+                        (getApplicationContext(),android.R.layout.simple_list_item_1,Products);
+                editListview.setAdapter(adapter);
+
+
+            }
+        });
+
         /*
         // Creamos el método OnItem
         listView.setOnClickListener(new AdapterView.OnItemClickListener() {
@@ -184,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
         }
         cursor.close();
     }
+
 
     private void mostrar() {
         String C1, C2, C3,C4;
