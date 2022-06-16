@@ -157,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
             adapter=new ArrayAdapter<String>
                     (getApplicationContext(),android.R.layout.simple_list_item_1,Products);
             editListview.setAdapter(adapter);
+            editListview.setScrollContainer(true);
         }
         //Funcion para poder cargar el contenido dentro del listview
         editListview.setOnItemClickListener(new AdapterView.OnItemClickListener(){

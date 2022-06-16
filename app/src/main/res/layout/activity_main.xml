@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -181,10 +181,10 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_weight="55">
                         <ListView
-                            android:layout_width="wrap_content"
-                            android:layout_height="400dp"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:id="@+id/Listview1"
                             />
@@ -215,61 +215,96 @@
                 android:id="@+id/tab3"
                 >
 
-                <ListView
-                    android:id="@+id/idEdtLitsView"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    />
+                    android:layout_weight="60"
+                    android:orientation="vertical">
 
-                <!--edit text de nombre-->
-                <EditText
-                    android:id="@+id/idEdtName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Name: " />
+                    <ListView
+                        android:id="@+id/idEdtLitsView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:smoothScrollbar="true"
+                        />
 
-                <!--edit text de descripcion-->
-                <EditText
-                    android:id="@+id/idEdtDescription"
+                </LinearLayout>
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Description: "/>
+                    android:layout_weight="4"
+                    android:orientation="vertical">
 
-                <!--edit text de la marca-->
-                <EditText
-                    android:id="@+id/idEdtBrand"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Brand: "/>
+                    <!--edit text de nombre-->
+                    <EditText
+                        android:id="@+id/idEdtName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:hint="Name" />
 
-                <!--edit text del campo 'Data'-->
-                <EditText
-                    android:id="@+id/idEdtData"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Data: "/>
+                    <!--edit text de descripcion-->
+                    <EditText
+                        android:id="@+id/idEdtDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:hint="Description "/>
 
-                <!--edit text de precio -->
-                <EditText
-                    android:id="@+id/idEdtPrice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Price: "/>
+                    <!--edit text de la marca-->
+                    <EditText
+                        android:id="@+id/idEdtBrand"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:hint="Brand"/>
 
-                <!--button for updating our course-->
-                <Button
-                    android:id="@+id/idBtnUpdateProduct"
+                    <!--edit text del campo 'Data'-->
+                    <EditText
+                        android:id="@+id/idEdtData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:hint="Data"/>
+
+                    <!--edit text de precio -->
+                    <EditText
+                        android:id="@+id/idEdtPrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:hint="Price"/>
+
+                </LinearLayout>
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="Update Producto"
-                    android:textAllCaps="false" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <!--button for updating our course-->
+                    <Button
+                        android:id="@+id/idBtnUpdateProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="Update Producto"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+
+
+
+
+
+
 
             </LinearLayout>
 
@@ -290,4 +325,4 @@
 
         </FrameLayout>
     </TabHost>
-</ScrollView>
+</LinearLayout>
