@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder ADX;
     AlertDialog AD;
     SQLiteDatabase db;
-    int SiguienteID;
+    int SiguienteID, idElem;
     EditText edt1,edt2,edt3,edt4,edt5, idEdtName, idEdtDescription, idEdtBrand;
     Cursor cursor;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
 
                 int pos = position +1;
+                idElem = pos;
 
                 cursor = db.rawQuery("select * from "+TABLA_PRINCIPAL+" WHERE _id ="+pos, null);
 
@@ -205,9 +206,9 @@ public class MainActivity extends AppCompatActivity {
                     values.put("descripcion",idEdtDescription.getText().toString());
                     values.put("marca",idEdtBrand.getText().toString());
 
-                    Args = idEdtName.getText().toString();
+                    Args = Integer.toString(idElem);
 
-                    db.update(TABLA_PRINCIPAL,values,"nombre = ?",new String[]{Args});
+                    db.update(TABLA_PRINCIPAL,values,"_id = ?",new String[]{Args});
                     //db.insert(TABLA_PRINCIPAL,null,values);
                     AD.setMessage("Producto actualizado");
                     AD.show();
