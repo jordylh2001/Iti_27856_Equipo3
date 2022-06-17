@@ -285,7 +285,6 @@ public class MainActivity extends AppCompatActivity {
                     AD.setMessage("Producto actualizado");
                     AD.show();
                 }
-
                 mostrar();
                 adapter = new ArrayAdapter<String>
                         (getApplicationContext(), android.R.layout.simple_list_item_1, Products);
