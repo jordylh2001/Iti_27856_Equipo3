@@ -32,14 +32,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     final String TABLA_PRINCIPAL = "Productos";
     final String TABLA_SECUNDARIA = "Precios";
-    //final String TABLA_TERCIARIA= "Precios";
+    final String TABLA_TERCIARIA= "Tickets";
     AgendaSqlite usdbh;
     AlertDialog.Builder ADX;
     AlertDialog AD;
     SQLiteDatabase db;
-    int SiguienteID, idElem, SiguinteID2;
+    int SiguienteID, idElem, SiguinteID2,idTicket;
     CheckBox cb1, cb2;
-    EditText edt1, edt2, edt3, edt4, edt5, edt6, idEdtName, idEdtDescription, idEdtBrand;
+    EditText edt1, edt2, edt3, edt4, edt5, edt6,edt7,edt8, idEdtName, idEdtDescription, idEdtBrand;
     Cursor cursor,cursor2;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
     private TextView TV1;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView editListview,listView;
 
-    private Button BT1, BT2, BT3, BT4, BT5,BT6;
+    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,15 +92,17 @@ public class MainActivity extends AppCompatActivity {
         tabHost.addTab(spec4);
         tabHost.addTab(spec5);
 
-
         edt1 = (EditText) findViewById(R.id.nombre);
         edt2 = (EditText) findViewById(R.id.description);
         edt3 = (EditText) findViewById(R.id.Brand);
         edt6 = (EditText) findViewById(R.id.amount);
         edt4 = (EditText) findViewById(R.id.Date);
         edt5 = (EditText) findViewById(R.id.Price);
-        listView = (ListView) findViewById(R.id.Listview1);
+        edt7= (EditText) findViewById(R.id.DateTicket);
+        edt8= (EditText) findViewById(R.id.Quantity);
 
+        listView = (ListView) findViewById(R.id.Listview1);
+        TV1=(TextView)findViewById(R.id.ActualTicket);
         idEdtName = (EditText) findViewById(R.id.idEdtName);
         idEdtDescription = (EditText) findViewById(R.id.idEdtDescription);
         idEdtBrand = (EditText) findViewById(R.id.idEdtBrand);
@@ -143,6 +145,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        getIdTicket();
 
         //Boton Add product to DB
         BT1 = (Button) findViewById(R.id.addProduct);
@@ -188,13 +192,34 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        BT7=(Button)findViewById(R.id.addTicket) ;
+        BT7.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+                if (db != null) {
+                    ContentValues values = new ContentValues();
+                    values.put("_id",idTicket);
+                    values.put("fecha",edt7.getText().toString());
+                    values.put("cuantity",edt8.getText().toString());
+                    int id = getIdProduct(edt1.getText().toString(), edt3.getText().toString());
+                    values.put("id_producto",id);
+
+
+                    Toast.makeText(MainActivity.this, values.toString(), Toast.LENGTH_SHORT).show();
+                    db.insert(TABLA_TERCIARIA, null, values);
+
+                }
+
+            }
+        });
 
         //Boton New Ticket
         BT6=(Button)findViewById(R.id.newTicket);
         BT6.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View arg0) {
-
+                idTicket+=1;
+                TV1.setText("Ticket Actual: "+idTicket);
             }
         });
 
@@ -214,16 +239,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        //Boton Add product to ticket
-        BT4 = (Button) findViewById(R.id.addTicket);
-        BT4.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View arg0) {
-
-            }
-        });
-
         //Ver si hay contenido dentro del los productos
         if (Products != null) {
             adapter = new ArrayAdapter<String>
@@ -319,6 +334,17 @@ public class MainActivity extends AppCompatActivity {
 
         //adapter.notifyDataSetChanged();
 
+    }
+
+    private void getIdTicket() {
+        cursor = db.rawQuery("select * from " + TABLA_TERCIARIA , null);
+        if (cursor.getCount() != 0) {
+            idTicket=cursor.getCount()+1;
+        }else{
+            idTicket=1;
+        }
+        TV1.setText("Ticket actual: "+idTicket);
+        cursor.close();
     }
 
     private boolean verficiacion(String name, String brand) {
