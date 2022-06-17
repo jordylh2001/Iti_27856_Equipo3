@@ -42,6 +42,19 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/ActualTicket"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Ticket actual:" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
                         android:id="@+id/TextView2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -144,7 +157,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Date" />
+                        android:text="Date of the price" />
 
                     <EditText
                         android:id="@+id/Date"
@@ -174,6 +187,27 @@
                         android:layout_weight="1"
                         android:inputType="numberDecimal"/>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/TextView10"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Date of the ticket" />
+
+                    <EditText
+                        android:id="@+id/DateTicket"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -194,6 +228,7 @@
                         android:layout_weight="1"
                         android:inputType="numberDecimal"/>
                 </LinearLayout>
+
 
                 <LinearLayout
                     android:id="@+id/tab1.2"
@@ -435,6 +470,12 @@
                 android:layout_weight="4"
                 android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/Tv2"/>
+
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -442,7 +483,6 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!--button for updating our course-->
                 <Button
                     android:id="@+id/Graficar"
                     android:layout_width="match_parent"
@@ -513,3 +553,4 @@
         </FrameLayout>
     </TabHost>
 </LinearLayout>
+
