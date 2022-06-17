@@ -17,8 +17,11 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog AD;
     SQLiteDatabase db;
     int SiguienteID, idElem;
-    EditText edt1,edt2,edt3,edt4,edt5, idEdtName, idEdtDescription, idEdtBrand;
+    CheckBox cb1,cb2;
+    EditText edt1,edt2,edt3,edt4,edt5,edt6, idEdtName, idEdtDescription, idEdtBrand;
     Cursor cursor;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
     private TextView TV1;
@@ -78,17 +82,23 @@ public class MainActivity extends AppCompatActivity {
         spec4.setContent(R.id.tab4);
         spec4.setIndicator("Ticket");
 
+        TabHost.TabSpec spec5 = tabHost.newTabSpec("");
+        spec5.setContent(R.id.tab5);
+        spec5.setIndicator("Import/Export");
+
         tabHost.addTab(spec1);
         tabHost.addTab(spec2);
         tabHost.addTab(spec3);
         tabHost.addTab(spec4);
+        tabHost.addTab(spec5);
+
 
         edt1=(EditText)findViewById(R.id.nombre);
         edt2=(EditText)findViewById(R.id.description);
         edt3=(EditText)findViewById(R.id.Brand);
+        edt6=(EditText)findViewById(R.id.amount);
         edt4=(EditText)findViewById(R.id.Date);
         edt5=(EditText)findViewById(R.id.Price);
-        TV1=(TextView)findViewById(R.id.TV2);
         listView = (ListView)findViewById(R.id.Listview1);
 
         idEdtName = (EditText) findViewById(R.id.idEdtName);
@@ -111,6 +121,28 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter );
 
          */
+        cb1=(CheckBox)findViewById(R.id.checkbox_unit);
+
+
+        cb2=(CheckBox)findViewById(R.id.checkbox_kg);
+        cb1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (cb1.isChecked()){
+                    cb2.setChecked(false);
+                    edt6.setEnabled(false);
+                }
+            }
+        });
+        cb2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (cb2.isChecked()){
+                    cb1.setChecked(false);
+                    edt6.setEnabled(true);
+                }
+            }
+        });
         BT1 = (Button) findViewById (R.id.addProduct);
         BT1.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -240,6 +272,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     private void cargar() {
         String C1, C2, C3,C4;
         String Fin="";
@@ -316,7 +350,6 @@ public class MainActivity extends AppCompatActivity {
 
                 } while (cursor.moveToNext());
             }
-            TV1.setText(Fin);
         }
         cursor.close();
     }
