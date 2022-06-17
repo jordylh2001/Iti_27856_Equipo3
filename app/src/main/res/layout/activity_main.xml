@@ -216,6 +216,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Add Product to Ticket" />
+                    <Button
+                        android:id="@+id/newTicket"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="New Ticekt" />
 
 
                 </LinearLayout>

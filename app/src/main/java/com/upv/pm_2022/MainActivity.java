@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
     int SiguienteID, idElem, SiguinteID2;
     CheckBox cb1, cb2;
     EditText edt1, edt2, edt3, edt4, edt5, edt6, idEdtName, idEdtDescription, idEdtBrand;
-    Cursor cursor;
-    Cursor cursor2;
+    Cursor cursor,cursor2;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
     private TextView TV1;
     private ArrayList<String> Products = new ArrayList<String>();
@@ -49,10 +48,9 @@ public class MainActivity extends AppCompatActivity {
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     private ArrayAdapter<String> adapter;
 
-    private ListView editListview;
+    private ListView editListview,listView;
 
-    private Button BT1, BT2, BT3, BT4, BT5;
-    private ListView listView;
+    private Button BT1, BT2, BT3, BT4, BT5,BT6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +189,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Boton New Ticket
+        BT6=(Button)findViewById(R.id.newTicket);
+        BT6.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+
+            }
+        });
+
         //Boton Show Products
         BT2 = (Button) findViewById(R.id.loadProducts);
         BT2.setOnClickListener(new View.OnClickListener() {
@@ -204,6 +211,15 @@ public class MainActivity extends AppCompatActivity {
                             (getApplicationContext(), android.R.layout.simple_list_item_1, Products);
                     listView.setAdapter(adapter);
                 }
+
+            }
+        });
+
+        //Boton Add product to ticket
+        BT4 = (Button) findViewById(R.id.addTicket);
+        BT4.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
 
             }
         });
@@ -278,12 +294,17 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        //Boton Add product to ticket
-        BT4 = (Button) findViewById(R.id.addTicket);
-        BT4.setOnClickListener();
+
 
         //Boton Analyze expenses
         BT5 = (Button) findViewById(R.id.Graficar);
+        BT5.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+
+            }
+        });
+
 
         /*
         // Creamos el método OnItem
