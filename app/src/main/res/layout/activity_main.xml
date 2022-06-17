@@ -261,7 +261,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:id="@+id/loadProducts"
-                            android:text="Cargar"
+                            android:text="Show products"
                             />
                     </LinearLayout>
                 </LinearLayout>
@@ -379,10 +379,72 @@
                 android:id="@+id/tab4"
                 >
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="6"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Analizar por"
+                    android:id="@+id/Atickets"/>
 
+                <CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/tickets"
+                    android:text="Tickets"/>
 
+                <CheckBox
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/Aproducto"
+                    android:text="Producto"/>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:orientation="vertical">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/infoAproducto"
+                    android:hint="name of the product"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:orientation="vertical">
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!--button for updating our course-->
+                <Button
+                    android:id="@+id/Graficar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Analyze expenses"
+                    android:textAllCaps="false" />
+            </LinearLayout>
             </LinearLayout>
 
             <!-- CONTROLES DEL Quinto TAB -->
@@ -393,8 +455,50 @@
                 android:paddingTop="200px"
                 android:id="@+id/tab5"
                 >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/importProducto"
+                        android:text="Importar Productos"
+                        android:layout_weight="1"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/importPrices"
+                        android:text="Importar Precios"
+                        android:layout_weight="1"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/importTicekts"
+                        android:text="Importar Tickets"
+                        android:layout_weight="1"/>
 
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/exportProducto"
+                        android:text="Export Productos"
+                        android:layout_weight="1"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/exporttPrices"
+                        android:text="Export Precios"
+                        android:layout_weight="1"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/exportTicekts"
+                        android:text="Export Tickets"
+                        android:layout_weight="1"/>
+                </LinearLayout>
 
 
 
