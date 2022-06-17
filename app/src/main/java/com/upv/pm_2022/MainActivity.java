@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder ADX;
     AlertDialog AD;
     SQLiteDatabase db;
-    int SiguienteID, idElem;
+    int SiguienteID, idElem,SiguinteID2;
     CheckBox cb1,cb2;
     EditText edt1,edt2,edt3,edt4,edt5,edt6, idEdtName, idEdtDescription, idEdtBrand;
     Cursor cursor;
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SiguienteID=0;
+        SiguinteID2=0;
         //cargar();
         // Importante: Esto va antes de instanciar controles dentro de cada pestaña
         // Agregar las pestañas---
@@ -153,15 +154,31 @@ public class MainActivity extends AppCompatActivity {
                 //Si hemos abierto correctamente la base de datos
                 if(db != null)
                 {
-                    Toast.makeText(MainActivity.this, "Insert" ,Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "Insert" ,Toast.LENGTH_SHORT).show();
                     //Generamos los datos
                     int codigo = SiguienteID;
                     ContentValues values = new ContentValues();
                     values.put("nombre",edt1.getText().toString());
                     values.put("descripcion",edt2.getText().toString());
                     values.put("marca",edt3.getText().toString());
+                    if(cb1.isChecked()){
+                        values.put("tipo",cb1.getText().toString());
+                        values.put("cantB",1);
+                    }else if(cb2.isChecked()){
+                        values.put("tipo",cb2.getText().toString());
+                        values.put("cantB",edt6.getText().toString());
+                    }
+                    ContentValues values2=new ContentValues();
+                    /*
+                    int id=getIdProduct(edt1.getText().toString(),edt3.getText().toString());
+
+                    values2.put("fecha",edt4.getText().toString());
+                    values2.put("precio",Double.valueOf(edt5.getText().toString()));
+                    values2.put("id_producto",id);
+                    */
                     db.insert(TABLA_PRINCIPAL,null,values);
-                    ConsultaTabla_ActualizaControl();
+
+                    //ConsultaTabla_ActualizaControl();
                     AD.setMessage("Insertando un producto");
                     AD.show();
                 }
@@ -272,37 +289,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-    private void cargar() {
-        String C1, C2, C3,C4;
+    private int getIdProduct(String name, String brand) {
+        String C1;
         String Fin="";
-        cursor = db.rawQuery("select * from "+TABLA_PRINCIPAL, null);
-
+        cursor = db.rawQuery("select _id from "+TABLA_PRINCIPAL+" where nombre="+name+" and marca="+brand, null);
+        Products.clear();
         if (cursor.getCount() != 0) {
             if (cursor.moveToFirst()) {
                 do {
                     C1 = cursor.getString(cursor
                             .getColumnIndexOrThrow("_id"));
-
-                    C2 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("nombre"));
-                    C3 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("descripcion"));
-                    C4 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("marca"));
-
-                    Products.add(C1 + "-" + C2 + "-" + C3 + "-" + C4);
-
+                    return Integer.valueOf(C1);
                 } while (cursor.moveToNext());
             }
         }
         cursor.close();
+        return 0;
     }
 
 
     private void mostrar() {
-        String C1, C2, C3,C4;
+        String C1, C2, C3,C4,C5,C6;
         String Fin="";
         cursor = db.rawQuery("select * from "+TABLA_PRINCIPAL, null);
         Products.clear();
@@ -318,35 +325,12 @@ public class MainActivity extends AppCompatActivity {
                             .getColumnIndexOrThrow("descripcion"));
                     C4 = cursor.getString(cursor
                             .getColumnIndexOrThrow("marca"));
+                    C5 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("tipo"));
+                    C6 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("cantB"));
 
-                    Products.add(C1 + "-" + C2 + "-" + C3 + "-" + C4);
-
-                } while (cursor.moveToNext());
-            }
-        }
-        cursor.close();
-    }
-
-    void ConsultaTabla_ActualizaControl ()
-    {
-        String C1, C2, C3,C4;
-        String Fin="";
-        cursor = db.rawQuery("select * from "+TABLA_PRINCIPAL, null);
-
-        if (cursor.getCount() != 0) {
-            if (cursor.moveToFirst()) {
-                do {
-                    C1 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("_id"));
-
-                    C2 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("nombre"));
-                    C3 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("descripcion"));
-                    C4 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("marca"));
-
-                    Fin += C1 + "-" + C2 + "-" + C3 + "-" + C4 + "\n";
+                    Products.add(C1 + "-" + C2 + "-" + C3 + "-" + C4 + "-" + C5 + "-" + C6);
 
                 } while (cursor.moveToNext());
             }
