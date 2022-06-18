@@ -1,27 +1,20 @@
 package com.upv.pm_2022;
 
-import static android.widget.AdapterView.*;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.res.AssetManager;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
-import android.nfc.Tag;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,14 +23,18 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.opencsv.CSVWriter;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,8 +42,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-import com.obsez.android.lib.filechooser.ChooserDialog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,29 +50,33 @@ public class MainActivity extends AppCompatActivity {
 
     final String TABLA_PRINCIPAL = "Productos";
     final String TABLA_SECUNDARIA = "Precios";
-    final String TABLA_TERCIARIA= "Tickets";
+    final String TABLA_TERCIARIA = "Tickets";
+    public String actualfilepath = "";
     AgendaSqlite usdbh;
     AlertDialog.Builder ADX;
     AlertDialog AD;
     SQLiteDatabase db;
-    int SiguienteID, idElem, SiguinteID2,idTicket=0,SiguinteID3;
+    int SiguienteID, idElem, SiguinteID2, idTicket = 0, SiguinteID3, importaux = 0;
     CheckBox cb1, cb2;
-    EditText edt1, edt2, edt3, edt4, edt5, edt6,edt7,edt8, idEdtName, idEdtDescription, idEdtBrand;
-    Cursor cursor,cursor2;
+    EditText edt1, edt2, edt3, edt4, edt5, edt6, edt7, edt8, idEdtName, idEdtDescription, idEdtBrand;
+    Cursor cursor, cursor2;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
-    private TextView TV1,TV2;
+    private TextView TV1, TV2;
     private ArrayList<String> Products = new ArrayList<String>();
 
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     private ArrayAdapter<String> adapter;
 
-    private ListView editListview,listView;
+    private ListView editListview, listView;
+    private int request_code = 1, FILE_SELECT_CODE = 101;
+    private String TAG = "mainactivity";
 
-    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7,dateButton,dateButton2, BT8, BT9, BT10, BT11;
+    private Button BT1, BT2, BT3, BT4, BT5, BT6, BT7, dateButton, dateButton2, BT8, BT9, BT10, BT11, BT12, BT13;
     private DatePickerDialog datePickerDialog;
 
     static String startingDir = Environment.getExternalStorageDirectory().toString();
     String Ruta;
+    InputStream inputStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,10 +127,10 @@ public class MainActivity extends AppCompatActivity {
         edt3 = (EditText) findViewById(R.id.Brand);
         edt6 = (EditText) findViewById(R.id.amount);
         edt5 = (EditText) findViewById(R.id.Price);
-        edt8= (EditText) findViewById(R.id.Quantity);
+        edt8 = (EditText) findViewById(R.id.Quantity);
 
         listView = (ListView) findViewById(R.id.Listview1);
-        TV1=(TextView)findViewById(R.id.ActualTicket);
+        TV1 = (TextView) findViewById(R.id.ActualTicket);
         idEdtName = (EditText) findViewById(R.id.idEdtName);
         idEdtDescription = (EditText) findViewById(R.id.idEdtDescription);
         idEdtBrand = (EditText) findViewById(R.id.idEdtBrand);
@@ -189,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //Si hemos abierto correctamente la base de datos
                 if (db != null) {
-                    if(verficiacion(edt1.getText().toString(), edt3.getText().toString())==false) {
+                    if (verficiacion(edt1.getText().toString(), edt3.getText().toString()) == false) {
                         //Toast.makeText(MainActivity.this, "Insert" ,Toast.LENGTH_SHORT).show();
                         //Generamos los datos
                         int codigo = SiguienteID;
@@ -224,17 +223,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //Boton Add product to ticket
-        BT7=(Button)findViewById(R.id.addTicket) ;
-        BT7.setOnClickListener(new View.OnClickListener(){
+        BT7 = (Button) findViewById(R.id.addTicket);
+        BT7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 if (db != null) {
                     ContentValues values = new ContentValues();
-                    values.put("numTicket",idTicket);
-                    values.put("fecha",getDate(dateButton2.getText().toString()));
-                    values.put("cuantity",edt8.getText().toString());
+                    values.put("numTicket", idTicket);
+                    values.put("fecha", getDate(dateButton2.getText().toString()));
+                    values.put("cuantity", edt8.getText().toString());
                     int id = getIdProduct(edt1.getText().toString(), edt3.getText().toString());
-                    values.put("id_producto",id);
+                    values.put("id_producto", id);
 
 
                     Toast.makeText(MainActivity.this, values.toString(), Toast.LENGTH_SHORT).show();
@@ -246,12 +245,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Boton New Ticket
-        BT6=(Button)findViewById(R.id.newTicket);
-        BT6.setOnClickListener(new View.OnClickListener(){
+        BT6 = (Button) findViewById(R.id.newTicket);
+        BT6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                idTicket+=1;
-                TV1.setText("Ticket actual: "+idTicket);
+                idTicket += 1;
+                TV1.setText("Ticket actual: " + idTicket);
             }
         });
 
@@ -341,10 +340,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        TV2=(TextView)findViewById(R.id.Tv2);
+        TV2 = (TextView) findViewById(R.id.Tv2);
         //Boton Analyze expenses
         BT5 = (Button) findViewById(R.id.Graficar);
-        BT5.setOnClickListener(new View.OnClickListener(){
+        BT5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 mostrarTickets();
@@ -353,36 +352,31 @@ public class MainActivity extends AppCompatActivity {
 
         //Boton Export Productos
         BT8 = (Button) findViewById(R.id.exportProducto);
-        BT8.setOnClickListener(new View.OnClickListener(){
+        BT8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
 
                 File exportDir = new File(Environment.getExternalStorageDirectory(), "");
-                if (!exportDir.exists())
-                {
+                if (!exportDir.exists()) {
                     exportDir.mkdirs();
                 }
 
                 File file = new File(exportDir, "Productos.csv");
-                try
-                {
+                try {
                     file.createNewFile();
                     CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                    Cursor curCSV = db.rawQuery("select * from "+TABLA_PRINCIPAL,null);
+                    Cursor curCSV = db.rawQuery("select * from " + TABLA_PRINCIPAL, null);
                     csvWrite.writeNext(curCSV.getColumnNames());
-                    while(curCSV.moveToNext())
-                    {
+                    while (curCSV.moveToNext()) {
                         //Which column you want to exprort
-                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3),
+                        String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2), curCSV.getString(3),
                                 curCSV.getString(4), curCSV.getString(5)};
                         csvWrite.writeNext(arrStr);
                     }
                     csvWrite.close();
                     curCSV.close();
                     Toast.makeText(getApplicationContext(), "Se exporto Productos exitosamente", Toast.LENGTH_SHORT).show();
-                }
-                catch(Exception sqlEx)
-                {
+                } catch (Exception sqlEx) {
                     Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
                 }
 
@@ -391,36 +385,31 @@ public class MainActivity extends AppCompatActivity {
 
         //Boton Export Precios
         BT9 = (Button) findViewById(R.id.exportPrices);
-        BT9.setOnClickListener(new View.OnClickListener(){
+        BT9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
 
                 File exportDir = new File(Environment.getExternalStorageDirectory(), "");
-                if (!exportDir.exists())
-                {
+                if (!exportDir.exists()) {
                     exportDir.mkdirs();
                 }
 
                 File file = new File(exportDir, "Precios.csv");
-                try
-                {
+                try {
                     file.createNewFile();
                     CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                    Cursor curCSV = db.rawQuery("select * from "+TABLA_SECUNDARIA,null);
+                    Cursor curCSV = db.rawQuery("select * from " + TABLA_SECUNDARIA, null);
                     csvWrite.writeNext(curCSV.getColumnNames());
-                    while(curCSV.moveToNext())
-                    {
+                    while (curCSV.moveToNext()) {
                         //Which column you want to exprort
-                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2),
+                        String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2),
                                 curCSV.getString(3)};
                         csvWrite.writeNext(arrStr);
                     }
                     csvWrite.close();
                     curCSV.close();
                     Toast.makeText(getApplicationContext(), "Se exporto Precios exitosamente", Toast.LENGTH_SHORT).show();
-                }
-                catch(Exception sqlEx)
-                {
+                } catch (Exception sqlEx) {
                     Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
                 }
 
@@ -429,36 +418,31 @@ public class MainActivity extends AppCompatActivity {
 
         //Boton Exporta Tickets
         BT10 = (Button) findViewById(R.id.exportTicekts);
-        BT10.setOnClickListener(new View.OnClickListener(){
+        BT10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
 
                 File exportDir = new File(Environment.getExternalStorageDirectory(), "");
-                if (!exportDir.exists())
-                {
+                if (!exportDir.exists()) {
                     exportDir.mkdirs();
                 }
 
                 File file = new File(exportDir, "Tickets.csv");
-                try
-                {
+                try {
                     file.createNewFile();
                     CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                    Cursor curCSV = db.rawQuery("select * from "+TABLA_TERCIARIA,null);
+                    Cursor curCSV = db.rawQuery("select * from " + TABLA_TERCIARIA, null);
                     csvWrite.writeNext(curCSV.getColumnNames());
-                    while(curCSV.moveToNext())
-                    {
+                    while (curCSV.moveToNext()) {
                         //Which column you want to exprort
-                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2),
-                                curCSV.getString(3)};
+                        String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2),
+                                curCSV.getString(3),curCSV.getString(4)};
                         csvWrite.writeNext(arrStr);
                     }
                     csvWrite.close();
                     curCSV.close();
                     Toast.makeText(getApplicationContext(), "Se exporto Tickets exitosamente", Toast.LENGTH_SHORT).show();
-                }
-                catch(Exception sqlEx)
-                {
+                } catch (Exception sqlEx) {
                     Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
                 }
 
@@ -467,19 +451,39 @@ public class MainActivity extends AppCompatActivity {
 
         //Boton Importar Productos
         BT11 = (Button) findViewById(R.id.importProducto);
-        BT11.setOnClickListener(new View.OnClickListener(){
+        BT11.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Ruta = "";
-                choosePath();
+                importaux = 1;
+                showFileChooser();
 
 
-                List<String[]> ListCSV = new ArrayList<String[]>();
+                //Toast.makeText(getApplicationContext(), "Se exporto Tickets exitosamente", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        //Boton Importar Productos
+        BT12 = (Button) findViewById(R.id.importPrices);
+        BT12.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                importaux = 2;
+                showFileChooser();
 
 
+                //Toast.makeText(getApplicationContext(), "Se exporto Tickets exitosamente", Toast.LENGTH_SHORT).show();
 
-                ListCSV = readCsv(getApplicationContext(),Ruta);
+            }
+        });
 
+        //Boton Importar Productos
+        BT13 = (Button) findViewById(R.id.importTicekts);
+        BT13.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                importaux = 3;
+                showFileChooser();
 
 
                 //Toast.makeText(getApplicationContext(), "Se exporto Tickets exitosamente", Toast.LENGTH_SHORT).show();
@@ -503,97 +507,171 @@ public class MainActivity extends AppCompatActivity {
         //adapter.notifyDataSetChanged();
 
     }
-    private void choosePath() {
-        new ChooserDialog(MainActivity.this)
-                .withFilter(false, false, "csv", "CSV")
-                .withStartFile(startingDir)
-                .withResources(R.string.app_name,R.string.yes_button,R.string.no_button)
-                .withChosenListener(new ChooserDialog.Result() {
-                    @Override
-                    public void onChoosePath(String path, File pathFile) {
-                        Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
-                        Ruta = path;
-                    }
-                })
-                .build()
-                .show();
-    }
 
-
-    public final List<String[]> readCsv(Context context, String CSV_PATH) {
-        List<String[]> questionList = new ArrayList<String[]>();
-        AssetManager assetManager = context.getAssets();
-
+    private void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         try {
-            InputStream csvStream = assetManager.open(CSV_PATH);
-            InputStreamReader csvStreamReader = new InputStreamReader(csvStream);
-            CSVReader csvReader = new CSVReader(csvStreamReader);
-            String[] line;
-
-            // throw away the header
-            csvReader.readNext();
-
-            while ((line = csvReader.readNext()) != null) {
-                questionList.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+        } catch (Exception e) {
+            Log.e(TAG, " choose file error " + e.toString());
         }
-        return questionList;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String fullerror = "";
+        if (requestCode == FILE_SELECT_CODE) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    InputStream stream = null;
+                    String tempID = "", id = "";
+                    Uri uri = data.getData();
+                    //Toast.makeText(this, uri.getPath(), Toast.LENGTH_SHORT).show();
+                    BufferedReader br;
+                    //System.out.println(uri.getPath());
+                    br = new BufferedReader(new InputStreamReader(getContentResolver().openInputStream(uri)));
+                    //WHAT TODO ? Is this creates new file with
+                    //the name NewFileName on internal app storage?
+                    String line = null;
+                    int aux = 0;
+                    while ((line = br.readLine()) != null) {
+                        if (aux != 0) {
+                            if (importaux == 1) {
+                                importProduct(line);
+                            }
+                            if (importaux == 2) {
+                                importPrices(line);
+                            }
+                            if (importaux == 3) {
+                                importTicket(line);
+                            }
+                        } else {
+                            aux += 1;
+                        }
+                    }
+                    br.close();
+                } catch (Exception e) {
+                    Log.e(TAG, " read errro " + e.toString());
+                }
+            }
+        }
+    }
 
+    private void importTicket(String line) {
+        String[] split = line.split(",");
+        //System.out.println(split[1]+" - "+split[2]+" - "+split[3]+"\n");
+        if (db != null) {
+            ContentValues values2 = new ContentValues();
+            int id = Integer.parseInt(((split[4].trim()).replace('"', ' ')).replace(" ", ""));
+            values2.put("numTicket", ((split[1].trim()).replace('"', ' ')).replace(" ", ""));
+            values2.put("fecha", ((split[2].trim()).replace('"', ' ')).replace(" ", ""));
+            values2.put("cuantity", ((split[3].trim()).replace('"', ' ')).replace(" ", ""));
+            values2.put("id_producto", id);
+            db.insert(TABLA_TERCIARIA, null, values2);
+
+            /*
+
+
+             */
+            //Toast.makeText(this, split.toString(), Toast.LENGTH_SHORT).show();
+            AD.setMessage("Tabla importada");
+            AD.show();
+        }
+    }
+
+    private void importPrices(String line) {
+        String[] split = line.split(",");
+        //System.out.println(split[1]+" - "+split[2]+" - "+split[3]+"\n");
+        if (db != null) {
+            ContentValues values2 = new ContentValues();
+            int id = Integer.parseInt(((split[3].trim()).replace('"', ' ')).replace(" ", ""));
+            System.out.println(id);
+            values2.put("fecha", ((split[1].trim()).replace('"', ' ')).replace(" ", ""));
+            values2.put("precio", ((split[2].trim()).replace('"', ' ')).replace(" ", ""));
+            values2.put("id_producto", id);
+
+            db.insert(TABLA_SECUNDARIA, null, values2);
+
+            /*
+
+
+             */
+            //Toast.makeText(this, split.toString(), Toast.LENGTH_SHORT).show();
+            AD.setMessage("Tabla importada");
+            AD.show();
+        }
+    }
+
+    private void importProduct(String line) {
+        if (db != null) {
+            String[] split = line.split(",");
+            ContentValues values = new ContentValues();
+            System.out.println(split[1] + " - " + split[2] + " - " + split[3] + " - " + split[4] + " - " + split[5] + "\n");
+            values.put("nombre", ((split[1].trim()).replace('"', ' ')).replace(" ", ""));
+            values.put("descripcion", ((split[2].trim()).replace('"', ' ')).replace(" ", ""));
+            values.put("marca",((split[3].trim()).replace('"', ' ')).replace(" ", ""));
+            values.put("tipo", ((split[4].trim()).replace('"', ' ')).replace(" ", ""));
+            values.put("cantB", ((split[5].trim()).replace('"', ' ')).replace(" ", ""));
+            //Toast.makeText(this, split.toString(), Toast.LENGTH_SHORT).show();
+            db.insert(TABLA_PRINCIPAL, null, values);
+            AD.setMessage("Tabla importada");
+            AD.show();
+        }
+    }
 
     private String getDate(String date) {
-        String fecha="";
-        String[] split=date.split(" ");
-        fecha=split[2];
-        switch (split[0]){
+        String fecha = "";
+        String[] split = date.split(" ");
+        fecha = split[2];
+        switch (split[0]) {
             case "JAN":
-                fecha+="-01";
+                fecha += "-01";
                 break;
             case "FEB":
-                fecha+="-02";
+                fecha += "-02";
                 break;
             case "MAR":
-                fecha+="-03";
+                fecha += "-03";
                 break;
             case "APR":
-                fecha+="-04";
+                fecha += "-04";
                 break;
             case "MAY":
-                fecha+="-05";
+                fecha += "-05";
                 break;
             case "JUN":
-                fecha+="-06";
+                fecha += "-06";
                 break;
             case "JUL":
-                fecha+="-07";
+                fecha += "-07";
                 break;
             case "AUG":
-                fecha+="-08";
+                fecha += "-08";
                 break;
             case "SEP":
-                fecha+="-09";
+                fecha += "-09";
                 break;
             case "OCT":
-                fecha+="-10";
+                fecha += "-10";
                 break;
             case "NOV":
-                fecha+="-11";
+                fecha += "-11";
                 break;
             case "DEC":
-                fecha+="-12";
+                fecha += "-12";
                 break;
             default:
 
         }
-        fecha+="-"+split[1];
+        fecha += "-" + split[1];
         return fecha;
     }
 
     private void mostrarTickets() {
-        String C1, C2, C3, C4,C5;
+        String C1, C2, C3, C4, C5;
         cursor = db.rawQuery("select * from " + TABLA_TERCIARIA, null);
         TV2.setText("");
         if (cursor.getCount() != 0) {
@@ -609,7 +687,7 @@ public class MainActivity extends AppCompatActivity {
                             .getColumnIndexOrThrow("cuantity"));
                     C5 = cursor.getString(cursor
                             .getColumnIndexOrThrow("id_producto"));
-                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 + "-" + C5 + "\n" );
+                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 + "-" + C5 + "\n");
                 } while (cursor.moveToNext());
             }
         }
@@ -617,8 +695,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String getTodaysDate()
-    {
+    private String getTodaysDate() {
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
@@ -627,13 +704,10 @@ public class MainActivity extends AppCompatActivity {
         return makeDateString(day, month, year);
     }
 
-    private void initDatePicker()
-    {
-        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener()
-        {
+    private void initDatePicker() {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day)
-            {
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                 month = month + 1;
                 String date = makeDateString(day, month, year);
                 dateButton.setText(date);
@@ -652,66 +726,63 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private String makeDateString(int day, int month, int year)
-    {
+    private String makeDateString(int day, int month, int year) {
         return getMonthFormat(month) + " " + day + " " + year;
     }
 
-    private String getMonthFormat(int month)
-    {
-        if(month == 1)
+    private String getMonthFormat(int month) {
+        if (month == 1)
             return "JAN";
-        if(month == 2)
+        if (month == 2)
             return "FEB";
-        if(month == 3)
+        if (month == 3)
             return "MAR";
-        if(month == 4)
+        if (month == 4)
             return "APR";
-        if(month == 5)
+        if (month == 5)
             return "MAY";
-        if(month == 6)
+        if (month == 6)
             return "JUN";
-        if(month == 7)
+        if (month == 7)
             return "JUL";
-        if(month == 8)
+        if (month == 8)
             return "AUG";
-        if(month == 9)
+        if (month == 9)
             return "SEP";
-        if(month == 10)
+        if (month == 10)
             return "OCT";
-        if(month == 11)
+        if (month == 11)
             return "NOV";
-        if(month == 12)
+        if (month == 12)
             return "DEC";
 
         //default should never happen
         return "JAN";
     }
 
-    public void openDatePicker(View view)
-    {
+    public void openDatePicker(View view) {
         datePickerDialog.show();
     }
 
     private void getIdTicket() {
-        cursor = db.rawQuery("select * from " + TABLA_TERCIARIA , null);
+        cursor = db.rawQuery("select * from " + TABLA_TERCIARIA, null);
         if (cursor.getCount() != 0) {
-            idTicket=cursor.getCount()+1;
-        }else{
-            idTicket=1;
+            idTicket = cursor.getCount() + 1;
+        } else {
+            idTicket = 1;
         }
-        TV1.setText("Ticket actual: "+idTicket);
+        TV1.setText("Ticket actual: " + idTicket);
         cursor.close();
     }
 
     private boolean verficiacion(String name, String brand) {
-        boolean aux=false;
+        boolean aux = false;
         String C1;
         String Fin = "";
         cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL + " where nombre='" + name + "' and marca='" + brand + "'", null);
         Products.clear();
         if (cursor.getCount() != 0) {
-            aux=true;
+            aux = true;
             return aux;
         }
         cursor.close();
