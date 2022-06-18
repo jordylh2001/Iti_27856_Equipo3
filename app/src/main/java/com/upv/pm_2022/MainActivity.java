@@ -3,15 +3,19 @@ package com.upv.pm_2022;
 import static android.widget.AdapterView.*;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import com.opencsv.CSVWriter;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Adapter;
@@ -28,11 +32,17 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_ID_READ_PERMISSION = 100;
+    private static final int REQUEST_ID_WRITE_PERMISSION = 200;
+
     final String TABLA_PRINCIPAL = "Productos";
     final String TABLA_SECUNDARIA = "Precios";
     final String TABLA_TERCIARIA= "Tickets";
@@ -53,13 +63,16 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView editListview,listView;
 
-    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7,dateButton,dateButton2;
+    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7,dateButton,dateButton2, BT8, BT9, BT10;
     private DatePickerDialog datePickerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        askPermissionOnly();
+
         SiguienteID = 0;
         SiguinteID2 = 0;
         //cargar();
@@ -325,6 +338,120 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Boton Export Productos
+        BT8 = (Button) findViewById(R.id.exportProducto);
+        BT8.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+
+                File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+                if (!exportDir.exists())
+                {
+                    exportDir.mkdirs();
+                }
+
+                File file = new File(exportDir, "Productos.csv");
+                try
+                {
+                    file.createNewFile();
+                    CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+                    Cursor curCSV = db.rawQuery("select * from "+TABLA_PRINCIPAL,null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    while(curCSV.moveToNext())
+                    {
+                        //Which column you want to exprort
+                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2), curCSV.getString(3),
+                                curCSV.getString(4), curCSV.getString(5)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    curCSV.close();
+                    Toast.makeText(getApplicationContext(), "Se exporto Productos exitosamente", Toast.LENGTH_SHORT).show();
+                }
+                catch(Exception sqlEx)
+                {
+                    Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+                }
+
+            }
+        });
+
+        //Boton Analyze expenses
+        BT9 = (Button) findViewById(R.id.exportPrices);
+        BT9.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+
+                File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+                if (!exportDir.exists())
+                {
+                    exportDir.mkdirs();
+                }
+
+                File file = new File(exportDir, "Precios.csv");
+                try
+                {
+                    file.createNewFile();
+                    CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+                    Cursor curCSV = db.rawQuery("select * from "+TABLA_SECUNDARIA,null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    while(curCSV.moveToNext())
+                    {
+                        //Which column you want to exprort
+                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2),
+                                curCSV.getString(3)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    curCSV.close();
+                    Toast.makeText(getApplicationContext(), "Se exporto Precios exitosamente", Toast.LENGTH_SHORT).show();
+                }
+                catch(Exception sqlEx)
+                {
+                    Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+                }
+
+            }
+        });
+
+        //Boton Exporta Tickets
+        BT10 = (Button) findViewById(R.id.exportTicekts);
+        BT10.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+
+                File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+                if (!exportDir.exists())
+                {
+                    exportDir.mkdirs();
+                }
+
+                File file = new File(exportDir, "Tickets.csv");
+                try
+                {
+                    file.createNewFile();
+                    CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+                    Cursor curCSV = db.rawQuery("select * from "+TABLA_TERCIARIA,null);
+                    csvWrite.writeNext(curCSV.getColumnNames());
+                    while(curCSV.moveToNext())
+                    {
+                        //Which column you want to exprort
+                        String arrStr[] ={curCSV.getString(0),curCSV.getString(1), curCSV.getString(2),
+                                curCSV.getString(3)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    curCSV.close();
+                    Toast.makeText(getApplicationContext(), "Se exporto Tickets exitosamente", Toast.LENGTH_SHORT).show();
+                }
+                catch(Exception sqlEx)
+                {
+                    Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+                }
+
+            }
+        });
+
 
         /*
         // Creamos el método OnItem
@@ -341,6 +468,8 @@ public class MainActivity extends AppCompatActivity {
         //adapter.notifyDataSetChanged();
 
     }
+
+
 
     private String getDate(String date) {
         String fecha="";
@@ -520,7 +649,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void mostrar() {
         String C1, C2, C3, C4, C5, C6, C7, C8,aux;
         String Fin = "";
@@ -551,15 +679,18 @@ public class MainActivity extends AppCompatActivity {
                                 aux = cursor2.getString(cursor2
                                         .getColumnIndexOrThrow("_id"));
                                  */
+
                                 C7 = cursor2.getString(cursor2
                                         .getColumnIndexOrThrow("fecha"));
                                 C8 = cursor2.getString(cursor2
                                         .getColumnIndexOrThrow("precio"));
+
                                 aux = cursor2.getString(cursor2
                                         .getColumnIndexOrThrow("id_producto"));
                                 //Toast.makeText(this, "C1="+ C1 +" Aux="+aux , Toast.LENGTH_SHORT).show();
                                 if(aux.equals(C1)){
                                     Products.add(C1 + "/" + C2 + "/" + C3 + "/" + C4  + "/" + C5 + "/" + C6 + "/" + C7 + "/" + C8+"$");
+
                                 }
                             } while (cursor2.moveToNext());
                         }
@@ -571,4 +702,63 @@ public class MainActivity extends AppCompatActivity {
         }
         cursor.close();
     }
+
+
+    private void askPermissionOnly() {
+        this.askPermission(REQUEST_ID_WRITE_PERMISSION,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        this.askPermission(REQUEST_ID_READ_PERMISSION,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE);
+
+    }
+
+
+    // With Android Level >= 23, you have to ask the user
+    // for permission with device (For example read/write data on the device).
+    private boolean askPermission(int requestId, String permissionName) {
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+
+            // Check if we have permission
+            int permission = ActivityCompat.checkSelfPermission(this, permissionName);
+
+
+            if (permission != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                // If don't have permission so prompt the user.
+                this.requestPermissions(
+                        new String[]{permissionName},
+                        requestId
+                );
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // When you have the request results
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //
+        // Note: If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0) {
+            switch (requestCode) {
+                case REQUEST_ID_READ_PERMISSION: {
+                    if (grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getApplicationContext(), "Permission Lectura Concedido!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                case REQUEST_ID_WRITE_PERMISSION: {
+                    if (grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getApplicationContext(), "Permission Escritura Concedido!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Permission Cancelled!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
