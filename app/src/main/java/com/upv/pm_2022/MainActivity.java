@@ -346,7 +346,57 @@ public class MainActivity extends AppCompatActivity {
         String fecha="";
         String[] split=date.split(" ");
         fecha=split[2];
-        
+        if(month == 2)
+            return "FEB";
+        if(month == 3)
+            return "MAR";
+        if(month == 4)
+            return "APR";
+        if(month == 5)
+            return "MAY";
+        if(month == 6)
+            return "JUN";
+        if(month == 7)
+            return "JUL";
+        if(month == 8)
+            return "AUG";
+        if(month == 9)
+            return "SEP";
+        if(month == 10)
+            return "OCT";
+        if(month == 11)
+            return "NOV";
+        if(month == 12)
+            return "DEC";
+        switch (split[0]){
+            case "JAN":
+                fecha+="01";
+                break;
+            case "FEB":
+                break;
+            case "MAR":
+                break;
+            case "APR":
+                break;
+            case "MAY":
+                break;
+            case "JUN":
+                break;
+            case "JUL":
+                break;
+            case "AUG":
+                break;
+            case "SEP":
+                break;
+            case "OCT":
+                break;
+            case "NOV":
+                break;
+            case "DEC":
+                break;
+            default:
+
+        }
         return fecha;
     }
 
@@ -493,6 +543,26 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void mostrar() {
-
+        String C1, C2, C3, C4,C6,C7;
+        cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL, null);
+        Products.clear();
+        if (cursor.getCount() != 0) {
+            if (cursor.moveToFirst()) {
+                do {
+                    C1 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("_id"));
+                    C2 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("nombre"));
+                    C3 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("descripcion"));
+                    C4 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("marca"));
+                    C4 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("marca"));
+                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 +"\n" );
+                } while (cursor.moveToNext());
+            }
+        }
+        cursor.close();
     }
 }
