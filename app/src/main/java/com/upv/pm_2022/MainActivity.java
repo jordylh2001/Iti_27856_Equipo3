@@ -5,6 +5,7 @@ import static android.widget.AdapterView.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioGroup;
@@ -27,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     EditText edt1, edt2, edt3, edt4, edt5, edt6,edt7,edt8, idEdtName, idEdtDescription, idEdtBrand;
     Cursor cursor,cursor2;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
-    private TextView TV1;
+    private TextView TV1,TV2;
     private ArrayList<String> Products = new ArrayList<String>();
 
     //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
@@ -50,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView editListview,listView;
 
-    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7;
+    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7,dateButton,dateButton2;
+    private DatePickerDialog datePickerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +100,7 @@ public class MainActivity extends AppCompatActivity {
         edt2 = (EditText) findViewById(R.id.description);
         edt3 = (EditText) findViewById(R.id.Brand);
         edt6 = (EditText) findViewById(R.id.amount);
-        edt4 = (EditText) findViewById(R.id.Date);
         edt5 = (EditText) findViewById(R.id.Price);
-        edt7= (EditText) findViewById(R.id.DateTicket);
         edt8= (EditText) findViewById(R.id.Quantity);
 
         listView = (ListView) findViewById(R.id.Listview1);
@@ -124,8 +126,9 @@ public class MainActivity extends AppCompatActivity {
 
          */
         cb1 = (CheckBox) findViewById(R.id.checkbox_unit);
-
-
+        initDatePicker();
+        dateButton = findViewById(R.id.datePickerButton);
+        dateButton.setText(getTodaysDate());
         cb2 = (CheckBox) findViewById(R.id.checkbox_kg);
         cb1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -145,6 +148,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        dateButton2 = findViewById(R.id.datePickerButton2);
+        dateButton2.setText(getTodaysDate());
 
         getIdTicket();
 
@@ -178,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                     ContentValues values2 = new ContentValues();
                     int id = getIdProduct(edt1.getText().toString(), edt3.getText().toString());
 
-                    values2.put("fecha", edt4.getText().toString());
+                    values2.put("fecha", getDate(dateButton.getText().toString()));
                     values2.put("precio", Double.valueOf(edt5.getText().toString()));
                     values2.put("id_producto", id);
                     db.insert(TABLA_SECUNDARIA, null, values2);
@@ -192,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        //Boton Add product to ticket
         BT7=(Button)findViewById(R.id.addTicket) ;
         BT7.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -309,13 +315,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        TV2=(TextView)findViewById(R.id.Tv2);
         //Boton Analyze expenses
         BT5 = (Button) findViewById(R.id.Graficar);
         BT5.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View arg0) {
-
+                mostrarTickets();
             }
         });
 
@@ -334,6 +340,112 @@ public class MainActivity extends AppCompatActivity {
 
         //adapter.notifyDataSetChanged();
 
+    }
+
+    private String getDate(String date) {
+        String fecha="";
+        String[] split=date.split(" ");
+        fecha=split[2];
+        
+        return fecha;
+    }
+
+    private void mostrarTickets() {
+        String C1, C2, C3, C4;
+        cursor = db.rawQuery("select * from " + TABLA_TERCIARIA, null);
+        if (cursor.getCount() != 0) {
+            if (cursor.moveToFirst()) {
+                do {
+                    C1 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("_id"));
+                    C2 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("fecha"));
+                    C3 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("cuantity"));
+                    C4 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("id_producto"));
+                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 +"\n" );
+                } while (cursor.moveToNext());
+            }
+        }
+        cursor.close();
+    }
+
+
+    private String getTodaysDate()
+    {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        month = month + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return makeDateString(day, month, year);
+    }
+
+    private void initDatePicker()
+    {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener()
+        {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day)
+            {
+                month = month + 1;
+                String date = makeDateString(day, month, year);
+                dateButton.setText(date);
+            }
+        };
+
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        int style = AlertDialog.THEME_HOLO_LIGHT;
+
+        datePickerDialog = new DatePickerDialog(this, style, dateSetListener, year, month, day);
+        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+    }
+
+    private String makeDateString(int day, int month, int year)
+    {
+        return getMonthFormat(month) + " " + day + " " + year;
+    }
+
+    private String getMonthFormat(int month)
+    {
+        if(month == 1)
+            return "JAN";
+        if(month == 2)
+            return "FEB";
+        if(month == 3)
+            return "MAR";
+        if(month == 4)
+            return "APR";
+        if(month == 5)
+            return "MAY";
+        if(month == 6)
+            return "JUN";
+        if(month == 7)
+            return "JUL";
+        if(month == 8)
+            return "AUG";
+        if(month == 9)
+            return "SEP";
+        if(month == 10)
+            return "OCT";
+        if(month == 11)
+            return "NOV";
+        if(month == 12)
+            return "DEC";
+
+        //default should never happen
+        return "JAN";
+    }
+
+    public void openDatePicker(View view)
+    {
+        datePickerDialog.show();
     }
 
     private void getIdTicket() {
@@ -381,56 +493,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void mostrar() {
-        String C1, C2, C3, C4, C5, C6, C7, C8,aux;
-        String Fin = "";
-        cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL, null);
-        Products.clear();
-        if (cursor.getCount() != 0) {
-            if (cursor.moveToFirst()) {
-                do {
-                    C1 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("_id"));
-                    C2 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("nombre"));
-                    C3 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("descripcion"));
-                    C4 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("marca"));
-                    C5 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("tipo"));
-                    C6 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("cantB"));
-                    //Toast.makeText(this, "llego a la tabla prueba1", Toast.LENGTH_SHORT).show();
-                    cursor2 = db.rawQuery("select * from " + TABLA_SECUNDARIA , null);
-                    if (cursor2.getCount() != 0) {
-                        if (cursor2.moveToFirst()) {
-                            do {
-                                //Toast.makeText(this, "llego a la tabla 2", Toast.LENGTH_SHORT).show();
-                                /*
-                                aux = cursor2.getString(cursor2
-                                        .getColumnIndexOrThrow("_id"));
-                                 */
 
-                                C7 = cursor2.getString(cursor2
-                                        .getColumnIndexOrThrow("fecha"));
-                                C8 = cursor2.getString(cursor2
-                                        .getColumnIndexOrThrow("precio"));
-
-                                aux = cursor2.getString(cursor2
-                                        .getColumnIndexOrThrow("id_producto"));
-                                //Toast.makeText(this, "C1="+ C1 +" Aux="+aux , Toast.LENGTH_SHORT).show();
-                                if(aux.equals(C1)){
-                                    Products.add(C1 + "/" + C2 + "/" + C3 + "/" + C4  + "/" + C5 + "/" + C6 + "/" + C7 + "/" + C8+"$");
-
-                                }
-                            } while (cursor2.moveToNext());
-                        }
-                    }
-                    cursor2.close();
-                    //Products.add(C1 + "-" + C2 + "-" + C3 + "-" + C4 + "-" + C5 + "-" + C6 + "-"  );
-                } while (cursor.moveToNext());
-            }
-        }
-        cursor.close();
     }
 }

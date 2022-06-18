@@ -14,8 +14,8 @@ public class AgendaSqlite extends SQLiteOpenHelper {
 
     //Sentencia SQL para crear la tabla de Usuarios
     String sqlCreate   = "CREATE TABLE Productos       (_id INTEGER PRIMARY KEY, nombre TEXT,descripcion TEXT,marca TEXT,tipo TEXT,cantB REAL)";
-    String sqlCreate2  = "CREATE TABLE Precios     (_id INTEGER PRIMARY KEY, fecha TEXT, precio REAL, id_producto REFERENCES Productos(_id))";
-    String sqlCreate3  = "CREATE TABLE Tickets     (_id INTEGER PRIMARY KEY, fecha TEXT,cuantity REAL, id_producto REFERENCES Productos(_id))";
+    String sqlCreate2  = "CREATE TABLE Precios     (_id INTEGER PRIMARY KEY, fecha DATETIME, precio REAL, id_producto REFERENCES Productos(_id))";
+    String sqlCreate3  = "CREATE TABLE Tickets     (_id INTEGER PRIMARY KEY, fecha DATETIME,cuantity REAL, id_producto REFERENCES Productos(_id))";
 
     public AgendaSqlite(Context context, String name, CursorFactory factory,int version) {
         super(context, name, factory, version);
