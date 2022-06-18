@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder ADX;
     AlertDialog AD;
     SQLiteDatabase db;
-    int SiguienteID, idElem, SiguinteID2,idTicket;
+    int SiguienteID, idElem, SiguinteID2,idTicket=0,SiguinteID3;
     CheckBox cb1, cb2;
     EditText edt1, edt2, edt3, edt4, edt5, edt6,edt7,edt8, idEdtName, idEdtDescription, idEdtBrand;
     Cursor cursor,cursor2;
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         SiguienteID = 0;
         SiguinteID2 = 0;
+        SiguinteID3 = 0;
         //cargar();
         // Importante: Esto va antes de instanciar controles dentro de cada pestaña
         // Agregar las pestañas---
@@ -164,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
         dateButton2 = findViewById(R.id.datePickerButton2);
         dateButton2.setText(getTodaysDate());
 
-        getIdTicket();
 
         //Boton Add product to DB
         BT1 = (Button) findViewById(R.id.addProduct);
@@ -217,8 +217,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 if (db != null) {
                     ContentValues values = new ContentValues();
-                    values.put("_id",idTicket);
-                    values.put("fecha",edt7.getText().toString());
+                    values.put("numTicket",idTicket);
+                    values.put("fecha",getDate(dateButton2.getText().toString()));
                     values.put("cuantity",edt8.getText().toString());
                     int id = getIdProduct(edt1.getText().toString(), edt3.getText().toString());
                     values.put("id_producto",id);
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 idTicket+=1;
-                TV1.setText("Ticket Actual: "+idTicket);
+                TV1.setText("Ticket actual: "+idTicket);
             }
         });
 
@@ -477,51 +477,66 @@ public class MainActivity extends AppCompatActivity {
         fecha=split[2];
         switch (split[0]){
             case "JAN":
-                fecha+="01";
+                fecha+="-01";
                 break;
             case "FEB":
+                fecha+="-02";
                 break;
             case "MAR":
+                fecha+="-03";
                 break;
             case "APR":
+                fecha+="-04";
                 break;
             case "MAY":
+                fecha+="-05";
                 break;
             case "JUN":
+                fecha+="-06";
                 break;
             case "JUL":
+                fecha+="-07";
                 break;
             case "AUG":
+                fecha+="-08";
                 break;
             case "SEP":
+                fecha+="-09";
                 break;
             case "OCT":
+                fecha+="-10";
                 break;
             case "NOV":
+                fecha+="-11";
                 break;
             case "DEC":
+                fecha+="-12";
                 break;
             default:
 
         }
+        fecha+="-"+split[1];
         return fecha;
     }
 
     private void mostrarTickets() {
-        String C1, C2, C3, C4;
+        String C1, C2, C3, C4,C5;
         cursor = db.rawQuery("select * from " + TABLA_TERCIARIA, null);
+        TV2.setText("");
         if (cursor.getCount() != 0) {
             if (cursor.moveToFirst()) {
                 do {
                     C1 = cursor.getString(cursor
                             .getColumnIndexOrThrow("_id"));
                     C2 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("fecha"));
+                            .getColumnIndexOrThrow("numTicket"));
                     C3 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("cuantity"));
+                            .getColumnIndexOrThrow("fecha"));
                     C4 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("cuantity"));
+                    C5 = cursor.getString(cursor
                             .getColumnIndexOrThrow("id_producto"));
-                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 +"\n" );
+                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 + "-" + C5 + "\n" );
                 } while (cursor.moveToNext());
             }
         }
