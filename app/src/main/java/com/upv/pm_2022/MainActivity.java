@@ -346,28 +346,6 @@ public class MainActivity extends AppCompatActivity {
         String fecha="";
         String[] split=date.split(" ");
         fecha=split[2];
-        if(month == 2)
-            return "FEB";
-        if(month == 3)
-            return "MAR";
-        if(month == 4)
-            return "APR";
-        if(month == 5)
-            return "MAY";
-        if(month == 6)
-            return "JUN";
-        if(month == 7)
-            return "JUL";
-        if(month == 8)
-            return "AUG";
-        if(month == 9)
-            return "SEP";
-        if(month == 10)
-            return "OCT";
-        if(month == 11)
-            return "NOV";
-        if(month == 12)
-            return "DEC";
         switch (split[0]){
             case "JAN":
                 fecha+="01";
@@ -542,8 +520,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     private void mostrar() {
-        String C1, C2, C3, C4,C6,C7;
+        String C1, C2, C3, C4, C5, C6, C7, C8,aux;
+        String Fin = "";
         cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL, null);
         Products.clear();
         if (cursor.getCount() != 0) {
@@ -557,9 +537,35 @@ public class MainActivity extends AppCompatActivity {
                             .getColumnIndexOrThrow("descripcion"));
                     C4 = cursor.getString(cursor
                             .getColumnIndexOrThrow("marca"));
-                    C4 = cursor.getString(cursor
-                            .getColumnIndexOrThrow("marca"));
-                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 +"\n" );
+                    C5 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("tipo"));
+                    C6 = cursor.getString(cursor
+                            .getColumnIndexOrThrow("cantB"));
+                    //Toast.makeText(this, "llego a la tabla prueba1", Toast.LENGTH_SHORT).show();
+                    cursor2 = db.rawQuery("select * from " + TABLA_SECUNDARIA , null);
+                    if (cursor2.getCount() != 0) {
+                        if (cursor2.moveToFirst()) {
+                            do {
+                                //Toast.makeText(this, "llego a la tabla 2", Toast.LENGTH_SHORT).show();
+                                /*
+                                aux = cursor2.getString(cursor2
+                                        .getColumnIndexOrThrow("_id"));
+                                 */
+                                C7 = cursor2.getString(cursor2
+                                        .getColumnIndexOrThrow("fecha"));
+                                C8 = cursor2.getString(cursor2
+                                        .getColumnIndexOrThrow("precio"));
+                                aux = cursor2.getString(cursor2
+                                        .getColumnIndexOrThrow("id_producto"));
+                                //Toast.makeText(this, "C1="+ C1 +" Aux="+aux , Toast.LENGTH_SHORT).show();
+                                if(aux.equals(C1)){
+                                    Products.add(C1 + "/" + C2 + "/" + C3 + "/" + C4  + "/" + C5 + "/" + C6 + "/" + C7 + "/" + C8+"$");
+                                }
+                            } while (cursor2.moveToNext());
+                        }
+                    }
+                    cursor2.close();
+                    //Products.add(C1 + "-" + C2 + "-" + C3 + "-" + C4 + "-" + C5 + "-" + C6 + "-"  );
                 } while (cursor.moveToNext());
             }
         }
