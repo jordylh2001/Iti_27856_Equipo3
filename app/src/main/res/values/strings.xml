@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">iti_equipo_3</string>
+    <string name="yes_button">Si</string>
+    <string name="no_button">NO</string>
 </resources>

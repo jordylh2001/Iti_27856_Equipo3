@@ -9,9 +9,12 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -32,11 +35,18 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import com.obsez.android.lib.filechooser.ChooserDialog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,8 +73,11 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView editListview,listView;
 
-    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7,dateButton,dateButton2, BT8, BT9, BT10;
+    private Button BT1, BT2, BT3, BT4, BT5,BT6,BT7,dateButton,dateButton2, BT8, BT9, BT10, BT11;
     private DatePickerDialog datePickerDialog;
+
+    static String startingDir = Environment.getExternalStorageDirectory().toString();
+    String Ruta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -376,7 +389,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Boton Analyze expenses
+        //Boton Export Precios
         BT9 = (Button) findViewById(R.id.exportPrices);
         BT9.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -452,6 +465,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Boton Importar Productos
+        BT11 = (Button) findViewById(R.id.importProducto);
+        BT11.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+                Ruta = "";
+                choosePath();
+
+
+                List<String[]> ListCSV = new ArrayList<String[]>();
+
+
+
+                ListCSV = readCsv(getApplicationContext(),Ruta);
+
+
+
+                //Toast.makeText(getApplicationContext(), "Se exporto Tickets exitosamente", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
 
         /*
         // Creamos el método OnItem
@@ -467,6 +502,44 @@ public class MainActivity extends AppCompatActivity {
 
         //adapter.notifyDataSetChanged();
 
+    }
+    private void choosePath() {
+        new ChooserDialog(MainActivity.this)
+                .withFilter(false, false, "csv", "CSV")
+                .withStartFile(startingDir)
+                .withResources(R.string.app_name,R.string.yes_button,R.string.no_button)
+                .withChosenListener(new ChooserDialog.Result() {
+                    @Override
+                    public void onChoosePath(String path, File pathFile) {
+                        Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
+                        Ruta = path;
+                    }
+                })
+                .build()
+                .show();
+    }
+
+
+    public final List<String[]> readCsv(Context context, String CSV_PATH) {
+        List<String[]> questionList = new ArrayList<String[]>();
+        AssetManager assetManager = context.getAssets();
+
+        try {
+            InputStream csvStream = assetManager.open(CSV_PATH);
+            InputStreamReader csvStreamReader = new InputStreamReader(csvStream);
+            CSVReader csvReader = new CSVReader(csvStreamReader);
+            String[] line;
+
+            // throw away the header
+            csvReader.readNext();
+
+            while ((line = csvReader.readNext()) != null) {
+                questionList.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return questionList;
     }
 
 
