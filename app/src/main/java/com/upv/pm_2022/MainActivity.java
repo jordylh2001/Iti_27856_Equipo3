@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog AD;
     SQLiteDatabase db;
     int SiguienteID, idElem, SiguinteID2, idTicket = 0, SiguinteID3, importaux = 0;
-    CheckBox cb1, cb2;
-    EditText edt1, edt2, edt3, edt4, edt5, edt6, edt7, edt8, idEdtName, idEdtDescription, idEdtBrand;
+    CheckBox cb1, cb2,cb3,cb4;
+    EditText edt1, edt2, edt3, edt4, edt5, edt6, edt7, edt8, idEdtName, idEdtDescription, idEdtBrand,idEdAmount,idEdPrice;
     Cursor cursor, cursor2;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
     private TextView TV1, TV2;
@@ -69,10 +69,10 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView editListview, listView;
     private int request_code = 1, FILE_SELECT_CODE = 101;
-    private String TAG = "mainactivity";
+    private String TAG = "mainactivity",fechaElem;
 
-    private Button BT1, BT2, BT3, BT4, BT5, BT6, BT7, dateButton, dateButton2, BT8, BT9, BT10, BT11, BT12, BT13;
-    private DatePickerDialog datePickerDialog;
+    private Button BT1, BT2, BT3, BT4, BT5, BT6, BT7, dateButton, dateButton2,dateButton3, BT8, BT9, BT10, BT11, BT12, BT13;
+    private DatePickerDialog datePickerDialog,datePickerDialog2,datePickerDialog3;
 
     static String startingDir = Environment.getExternalStorageDirectory().toString();
     String Ruta;
@@ -134,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
         idEdtName = (EditText) findViewById(R.id.idEdtName);
         idEdtDescription = (EditText) findViewById(R.id.idEdtDescription);
         idEdtBrand = (EditText) findViewById(R.id.idEdtBrand);
-
+        idEdAmount = (EditText) findViewById(R.id.idEdtAmount);
+        idEdPrice = (EditText) findViewById(R.id.idEdtPrice);
         editListview = (ListView) findViewById(R.id.idEdtLitsView);
 
         ADX = new AlertDialog.Builder(this);
@@ -153,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
          */
         cb1 = (CheckBox) findViewById(R.id.checkbox_unit);
         initDatePicker();
+        initDatePicker2();
+        initDatePicker3();
         dateButton = findViewById(R.id.datePickerButton);
         dateButton.setText(getTodaysDate());
         cb2 = (CheckBox) findViewById(R.id.checkbox_kg);
@@ -165,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
         cb2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -174,8 +178,32 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        cb3 = (CheckBox) findViewById(R.id.checkbox_unit2);
+        cb3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (cb3.isChecked()) {
+                    cb4.setChecked(false);
+                    idEdAmount.setText("");
+                    idEdAmount.setEnabled(false);
+                }
+            }
+        });
+        cb4 = (CheckBox) findViewById(R.id.checkbox_kg2);
+        cb4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (cb4.isChecked()) {
+                    cb3.setChecked(false);
+                    idEdAmount.setEnabled(true);
+                }
+            }
+        });
         dateButton2 = findViewById(R.id.datePickerButton2);
         dateButton2.setText(getTodaysDate());
+
+        dateButton3 = findViewById(R.id.datePickerButton3);
+        dateButton3.setText(getTodaysDate());
 
 
         //Boton Add product to DB
@@ -288,6 +316,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String[] split = value.split("/");
                 idElem = Integer.valueOf(split[0]);
+                fechaElem=split[6];
                 System.out.println("Done");
                 cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL + " WHERE _id =" + idElem, null);
 
@@ -295,10 +324,32 @@ public class MainActivity extends AppCompatActivity {
                     if (cursor.moveToFirst()) {
                         do {
                             //C1 = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+                            String name,desc,brand,C2,amount,fecha,price;
+                            int month,day,year;
 
-                            idEdtName.setText(cursor.getString(cursor.getColumnIndexOrThrow("nombre")));
-                            idEdtDescription.setText(cursor.getString(cursor.getColumnIndexOrThrow("descripcion")));
-                            idEdtBrand.setText(cursor.getString(cursor.getColumnIndexOrThrow("marca")));
+                            name=cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
+                            desc=cursor.getString(cursor.getColumnIndexOrThrow("descripcion"));
+                            brand=cursor.getString(cursor.getColumnIndexOrThrow("marca"));
+                            C2=cursor.getString(cursor.getColumnIndexOrThrow("tipo"));
+                            amount=cursor.getString(cursor.getColumnIndexOrThrow("cantB"));
+                            fecha=split[6];
+                            String[] split2=fecha.split("-");
+                            year=Integer.valueOf(split2[0]);
+                            month=Integer.valueOf(split2[1]);
+                            day=Integer.valueOf(split2[2]);
+                            price=split[7];
+                            idEdtName.setText(name);
+                            idEdtDescription.setText(desc);
+                            idEdtBrand.setText(brand);
+
+                            if(C2.equals("Unit")){
+                                cb3.setChecked(true);
+                            }else if(C2.equals("Kg")){
+                                cb4.setChecked(true);
+                                idEdAmount.setText(amount);
+                            }
+                            idEdPrice.setText(price.replace("$",""));
+                            dateButton3.setText(makeDateString(day,month,year));
 
                         } while (cursor.moveToNext());
                     }
@@ -315,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
 
                 if (db != null) {
-                    Toast.makeText(MainActivity.this, "Update", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "Update", Toast.LENGTH_SHORT).show();
                     //Generamos los datos
                     //int codigo = SiguienteID;
                     String Args;
@@ -323,11 +374,22 @@ public class MainActivity extends AppCompatActivity {
                     values.put("nombre", idEdtName.getText().toString());
                     values.put("descripcion", idEdtDescription.getText().toString());
                     values.put("marca", idEdtBrand.getText().toString());
-
+                    if(cb3.isChecked()){
+                        values.put("tipo",cb3.getText().toString());
+                        values.put("cantB", 1);
+                    }else if(cb4.isChecked()){
+                        values.put("tipo",cb4.getText().toString());
+                        values.put("cantB", idEdAmount.getText().toString());
+                    }
                     Args = Integer.toString(idElem);
-
                     db.update(TABLA_PRINCIPAL, values, "_id = ?", new String[]{Args});
+                    ContentValues values2 = new ContentValues();
+                    values2.put("fecha",getDate(dateButton3.getText().toString()));
+                    values2.put("precio",idEdPrice.getText().toString());
+                    db.update(TABLA_SECUNDARIA,values2,  "_id = ? and fecha = ?", new String[]{Args, fechaElem});
+
                     //db.insert(TABLA_PRINCIPAL,null,values);
+
                     AD.setMessage("Producto actualizado");
                     AD.show();
                 }
@@ -726,6 +788,50 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void initDatePicker2() {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker2, int year, int month, int day) {
+                month = month + 1;
+                String date = makeDateString(day, month, year);
+                dateButton2.setText(date);
+            }
+        };
+
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        int style = AlertDialog.THEME_HOLO_LIGHT;
+
+        datePickerDialog2 = new DatePickerDialog(this, style, dateSetListener, year, month, day);
+        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+    }
+
+    private void initDatePicker3() {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker2, int year, int month, int day) {
+                month = month + 1;
+                String date = makeDateString(day, month, year);
+                dateButton3.setText(date);
+            }
+        };
+
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        int style = AlertDialog.THEME_HOLO_LIGHT;
+
+        datePickerDialog3 = new DatePickerDialog(this, style, dateSetListener, year, month, day);
+        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+    }
+
     private String makeDateString(int day, int month, int year) {
         return getMonthFormat(month) + " " + day + " " + year;
     }
@@ -762,6 +868,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void openDatePicker(View view) {
         datePickerDialog.show();
+    }
+
+    public void openDatePicker2(View view) {
+        datePickerDialog2.show();
+    }
+    public void openDatePicker3(View view) {
+        datePickerDialog3.show();
     }
 
     private void getIdTicket() {

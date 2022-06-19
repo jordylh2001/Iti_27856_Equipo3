@@ -216,7 +216,7 @@
                         android:textColor="@color/black"
                         style="?android:spinnerStyle"
                         android:layout_marginTop="10dp"
-                        android:onClick="openDatePicker"/>
+                        android:onClick="openDatePicker2"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -396,7 +396,7 @@
                     </LinearLayout>
 
                     <EditText
-                        android:id="@+id/amount2"
+                        android:id="@+id/idEdtAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -404,13 +404,16 @@
                         android:hint="Amount"/>
 
                     <!--edit text del campo 'Data'-->
-                    <EditText
-                        android:id="@+id/idEdtData"
-                        android:layout_width="match_parent"
+                    <Button
+                        android:id="@+id/datePickerButton3"
+                        android:layout_width="250dp"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:layout_weight="1"
-                        android:hint="Date"/>
+                        android:text="JAN 01 2020"
+                        android:textSize="10sp"
+                        android:textColor="@color/black"
+                        style="?android:spinnerStyle"
+                        android:layout_marginTop="10dp"
+                        android:onClick="openDatePicker3"/>
 
                     <!--edit text de precio -->
                     <EditText
