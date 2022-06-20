@@ -2,7 +2,6 @@ package com.upv.pm_2022;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -11,8 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,14 +31,13 @@ import com.opencsv.CSVWriter;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,14 +47,24 @@ public class MainActivity extends AppCompatActivity {
     final String TABLA_PRINCIPAL = "Productos";
     final String TABLA_SECUNDARIA = "Precios";
     final String TABLA_TERCIARIA = "Tickets";
-    public String actualfilepath = "";
     AgendaSqlite usdbh;
     AlertDialog.Builder ADX;
     AlertDialog AD;
     SQLiteDatabase db;
-    int SiguienteID, idElem, SiguinteID2, idTicket = 0, SiguinteID3, importaux = 0;
-    CheckBox cb1, cb2,cb3,cb4;
-    EditText edt1, edt2, edt3, edt4, edt5, edt6, edt7, edt8, idEdtName, idEdtDescription, idEdtBrand,idEdAmount,idEdPrice;
+    int SiguienteID, idElem, SiguinteID2, idTicket = 0, SiguinteID3, importaux = 0,aux=0;
+    CheckBox cb1, cb2, cb3, cb4, cb5, cb6;
+    EditText edt1;
+    EditText edt2;
+    EditText edt3;
+    EditText edt5;
+    EditText edt6;
+    EditText edt8;
+    EditText idEdtName;
+    EditText idEdtDescription;
+    EditText idEdtBrand;
+    EditText idEdAmount;
+    EditText idEdPrice;
+    EditText infprod;
     Cursor cursor, cursor2;
     final String NOMBRE_BASE_DATOS = "SuperMercado.db";
     private TextView TV1, TV2;
@@ -69,14 +75,11 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView editListview, listView;
     private int request_code = 1, FILE_SELECT_CODE = 101;
-    private String TAG = "mainactivity",fechaElem;
+    private String TAG = "mainactivity", fechaElem,contTicket = "",auxTicek="";
+    List<String> dates,amounts,id2;
 
-    private Button BT1, BT2, BT3, BT4, BT5, BT6, BT7, dateButton, dateButton2,dateButton3, BT8, BT9, BT10, BT11, BT12, BT13;
-    private DatePickerDialog datePickerDialog,datePickerDialog2,datePickerDialog3;
-
-    static String startingDir = Environment.getExternalStorageDirectory().toString();
-    String Ruta;
-    InputStream inputStream;
+    private Button BT1, BT2, BT3, BT5, BT6, BT7, dateButton, dateButton2, dateButton3, BT8, BT9, BT10, BT11, BT12, BT13;
+    private DatePickerDialog datePickerDialog, datePickerDialog2, datePickerDialog3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,6 +202,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        infprod = (EditText) findViewById(R.id.infoAproducto);
+        cb5 = (CheckBox) findViewById(R.id.tickets);
+        cb5.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (cb5.isChecked()) {
+                    cb6.setChecked(false);
+                    infprod.setText("");
+                    infprod.setEnabled(false);
+                }
+            }
+        });
+        cb6 = (CheckBox) findViewById(R.id.Aproducto);
+        cb6.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (cb6.isChecked()) {
+                    cb5.setChecked(false);
+                    infprod.setEnabled(true);
+                }
+            }
+        });
         dateButton2 = findViewById(R.id.datePickerButton2);
         dateButton2.setText(getTodaysDate());
 
@@ -316,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String[] split = value.split("/");
                 idElem = Integer.valueOf(split[0]);
-                fechaElem=split[6];
+                fechaElem = split[6];
                 System.out.println("Done");
                 cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL + " WHERE _id =" + idElem, null);
 
@@ -324,32 +349,32 @@ public class MainActivity extends AppCompatActivity {
                     if (cursor.moveToFirst()) {
                         do {
                             //C1 = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
-                            String name,desc,brand,C2,amount,fecha,price;
-                            int month,day,year;
+                            String name, desc, brand, C2, amount, fecha, price;
+                            int month, day, year;
 
-                            name=cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
-                            desc=cursor.getString(cursor.getColumnIndexOrThrow("descripcion"));
-                            brand=cursor.getString(cursor.getColumnIndexOrThrow("marca"));
-                            C2=cursor.getString(cursor.getColumnIndexOrThrow("tipo"));
-                            amount=cursor.getString(cursor.getColumnIndexOrThrow("cantB"));
-                            fecha=split[6];
-                            String[] split2=fecha.split("-");
-                            year=Integer.valueOf(split2[0]);
-                            month=Integer.valueOf(split2[1]);
-                            day=Integer.valueOf(split2[2]);
-                            price=split[7];
+                            name = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
+                            desc = cursor.getString(cursor.getColumnIndexOrThrow("descripcion"));
+                            brand = cursor.getString(cursor.getColumnIndexOrThrow("marca"));
+                            C2 = cursor.getString(cursor.getColumnIndexOrThrow("tipo"));
+                            amount = cursor.getString(cursor.getColumnIndexOrThrow("cantB"));
+                            fecha = split[6];
+                            String[] split2 = fecha.split("-");
+                            year = Integer.valueOf(split2[0]);
+                            month = Integer.valueOf(split2[1]);
+                            day = Integer.valueOf(split2[2]);
+                            price = split[7];
                             idEdtName.setText(name);
                             idEdtDescription.setText(desc);
                             idEdtBrand.setText(brand);
 
-                            if(C2.equals("Unit")){
+                            if (C2.equals("Unit")) {
                                 cb3.setChecked(true);
-                            }else if(C2.equals("Kg")){
+                            } else if (C2.equals("Kg")) {
                                 cb4.setChecked(true);
                                 idEdAmount.setText(amount);
                             }
-                            idEdPrice.setText(price.replace("$",""));
-                            dateButton3.setText(makeDateString(day,month,year));
+                            idEdPrice.setText(price.replace("$", ""));
+                            dateButton3.setText(makeDateString(day, month, year));
 
                         } while (cursor.moveToNext());
                     }
@@ -374,19 +399,19 @@ public class MainActivity extends AppCompatActivity {
                     values.put("nombre", idEdtName.getText().toString());
                     values.put("descripcion", idEdtDescription.getText().toString());
                     values.put("marca", idEdtBrand.getText().toString());
-                    if(cb3.isChecked()){
-                        values.put("tipo",cb3.getText().toString());
+                    if (cb3.isChecked()) {
+                        values.put("tipo", cb3.getText().toString());
                         values.put("cantB", 1);
-                    }else if(cb4.isChecked()){
-                        values.put("tipo",cb4.getText().toString());
+                    } else if (cb4.isChecked()) {
+                        values.put("tipo", cb4.getText().toString());
                         values.put("cantB", idEdAmount.getText().toString());
                     }
                     Args = Integer.toString(idElem);
                     db.update(TABLA_PRINCIPAL, values, "_id = ?", new String[]{Args});
                     ContentValues values2 = new ContentValues();
-                    values2.put("fecha",getDate(dateButton3.getText().toString()));
-                    values2.put("precio",idEdPrice.getText().toString());
-                    db.update(TABLA_SECUNDARIA,values2,  "_id = ? and fecha = ?", new String[]{Args, fechaElem});
+                    values2.put("fecha", getDate(dateButton3.getText().toString()));
+                    values2.put("precio", idEdPrice.getText().toString());
+                    db.update(TABLA_SECUNDARIA, values2, "_id = ? and fecha = ?", new String[]{Args, fechaElem});
 
                     //db.insert(TABLA_PRINCIPAL,null,values);
 
@@ -409,7 +434,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 mostrarTickets();
-            }
+                    List<String> prueba=new ArrayList<String>();
+                    if(cb5.isChecked()){
+                        getTickets();
+                    }else if(cb6.isChecked()){
+                        getProducts();
+                    }
+                    //TV2.append("Total de tickets="+cont+" En las fechas="+prueba);
+                }
         });
 
         //Boton Export Productos
@@ -498,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
                     while (curCSV.moveToNext()) {
                         //Which column you want to exprort
                         String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2),
-                                curCSV.getString(3),curCSV.getString(4)};
+                                curCSV.getString(3), curCSV.getString(4)};
                         csvWrite.writeNext(arrStr);
                     }
                     csvWrite.close();
@@ -569,6 +601,103 @@ public class MainActivity extends AppCompatActivity {
         //adapter.notifyDataSetChanged();
 
     }
+
+    private void getProducts() {
+        if(db!=null) {
+            String C1, C2, C3, C4, C5,C6,C7,C8,C9,C10,AUX="",id="";
+            int cont=0;
+            String name=infprod.getText().toString();
+            dates=new ArrayList<String>();
+            amounts=new ArrayList<String>();
+            id2=new ArrayList<String>();
+            dates.clear();
+            amounts.clear();
+            id2.clear();
+            cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL, null);
+            if (cursor.getCount() != 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        C6 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("_id"));
+                        C7= cursor.getString(cursor
+                                .getColumnIndexOrThrow("nombre"));
+                        if(C7.equals(name)){
+                            id=C6;
+                            id2.add(C6);
+                        }
+                    } while (cursor.moveToNext());
+                }
+            }
+            cursor.close();
+            cursor = db.rawQuery("select * from " + TABLA_TERCIARIA, null);
+            if (cursor.getCount() != 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        /*
+                        C1 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("_id"));
+
+                         */
+                        C2 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("numTicket"));
+
+                        C3 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("fecha"));
+
+                        C4 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("cuantity"));
+                        C5 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("id_producto"));
+                        if(C5.equals(id)){
+                            cont+=1;
+                            TV2.append("Se detecto en el ticket "+C2+" Total de tickets "+cont+"\n");
+                        }
+                    } while (cursor.moveToNext());
+                }
+            }
+            cursor.close();
+        }
+    }
+
+    private void getTickets() {
+
+        if(db!=null) {
+            String C1, C2, C3, C4, C5,AUX="";
+            int cont=0;
+            List<String> prueba=new ArrayList<String>();
+            cursor = db.rawQuery("select * from " + TABLA_TERCIARIA, null);
+            if (cursor.getCount() != 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        /*
+                        C1 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("_id"));
+
+                         */
+                        C2 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("numTicket"));
+
+                        C3 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("fecha"));
+                        System.out.println(C2);
+                        if(cont==0){
+
+                        }else{
+
+                        }
+                        C4 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("cuantity"));
+                        C5 = cursor.getString(cursor
+                                .getColumnIndexOrThrow("id_producto"));
+                        TV2.append("Total de tickets"+cont+"\n");
+                    } while (cursor.moveToNext());
+                }
+            }
+            cursor.close();
+        }
+    }
+
+
 
     private void showFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -674,7 +803,7 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(split[1] + " - " + split[2] + " - " + split[3] + " - " + split[4] + " - " + split[5] + "\n");
             values.put("nombre", ((split[1].trim()).replace('"', ' ')).replace(" ", ""));
             values.put("descripcion", ((split[2].trim()).replace('"', ' ')).replace(" ", ""));
-            values.put("marca",((split[3].trim()).replace('"', ' ')).replace(" ", ""));
+            values.put("marca", ((split[3].trim()).replace('"', ' ')).replace(" ", ""));
             values.put("tipo", ((split[4].trim()).replace('"', ' ')).replace(" ", ""));
             values.put("cantB", ((split[5].trim()).replace('"', ' ')).replace(" ", ""));
             //Toast.makeText(this, split.toString(), Toast.LENGTH_SHORT).show();
@@ -749,7 +878,7 @@ public class MainActivity extends AppCompatActivity {
                             .getColumnIndexOrThrow("cuantity"));
                     C5 = cursor.getString(cursor
                             .getColumnIndexOrThrow("id_producto"));
-                    TV2.append(C1 + "-" + C2 + "-" + C3 + "-" + C4 + "-" + C5 + "\n");
+                    TV2.append(C1 + "/" + C2 + "/" + C3 + "/" + C4 + "/" + C5 + "\n");
                 } while (cursor.moveToNext());
             }
         }
@@ -873,6 +1002,7 @@ public class MainActivity extends AppCompatActivity {
     public void openDatePicker2(View view) {
         datePickerDialog2.show();
     }
+
     public void openDatePicker3(View view) {
         datePickerDialog3.show();
     }
@@ -922,7 +1052,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void mostrar() {
-        String C1, C2, C3, C4, C5, C6, C7, C8,aux;
+        String C1, C2, C3, C4, C5, C6, C7, C8, aux;
         String Fin = "";
         cursor = db.rawQuery("select * from " + TABLA_PRINCIPAL, null);
         Products.clear();
@@ -942,7 +1072,7 @@ public class MainActivity extends AppCompatActivity {
                     C6 = cursor.getString(cursor
                             .getColumnIndexOrThrow("cantB"));
                     //Toast.makeText(this, "llego a la tabla prueba1", Toast.LENGTH_SHORT).show();
-                    cursor2 = db.rawQuery("select * from " + TABLA_SECUNDARIA , null);
+                    cursor2 = db.rawQuery("select * from " + TABLA_SECUNDARIA, null);
                     if (cursor2.getCount() != 0) {
                         if (cursor2.moveToFirst()) {
                             do {
@@ -960,8 +1090,8 @@ public class MainActivity extends AppCompatActivity {
                                 aux = cursor2.getString(cursor2
                                         .getColumnIndexOrThrow("id_producto"));
                                 //Toast.makeText(this, "C1="+ C1 +" Aux="+aux , Toast.LENGTH_SHORT).show();
-                                if(aux.equals(C1)){
-                                    Products.add(C1 + "/" + C2 + "/" + C3 + "/" + C4  + "/" + C5 + "/" + C6 + "/" + C7 + "/" + C8+"$");
+                                if (aux.equals(C1)) {
+                                    Products.add(C1 + "/" + C2 + "/" + C3 + "/" + C4 + "/" + C5 + "/" + C6 + "/" + C7 + "/" + C8 + "$");
 
                                 }
                             } while (cursor2.moveToNext());
